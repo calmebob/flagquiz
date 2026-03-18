@@ -1,5 +1,5 @@
 # Flag Quiz 🇯🇵 🇰🇷 🇩🇪 🇨🇳 🇺🇸 🇫🇷 🇪🇸 🇮🇹 🇷🇺 🇬🇧
 
-A simple flag quiz game to help my memorize the flags of the world.
+A simple flag quiz game.
 
 Made with React + Vite
