@@ -268,6 +268,35 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }
 .world-map-page > p { text-align: center; color: var(--text-medium); }
 .map-container { background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--card-shadow); overflow: hidden; position: relative; }
 
+/* Map view toggle */
+.map-view-toggle { display: flex; gap: 8px; justify-content: center; }
+.view-toggle-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+  border-radius: 10px; border: 2px solid #e8e8e8; background: var(--bg-white);
+  cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.9rem;
+  color: var(--text-medium); transition: all 0.2s;
+}
+.view-toggle-btn:hover { border-color: var(--sky-blue-light); }
+.view-toggle-btn.active { border-color: var(--sky-blue); background: rgba(78,205,196,0.08); color: var(--text-dark); }
+.view-toggle-ico { font-size: 1.1rem; }
+
+/* Country list (continent browse) */
+.continent-section {
+  background: var(--bg-white); border-radius: var(--radius-lg); padding: 24px;
+  box-shadow: var(--card-shadow);
+}
+.continent-section h3 { font-size: 1.1rem; margin-bottom: 14px; }
+.continent-count { font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.8rem; color: var(--text-medium); }
+.country-btn-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.country-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px;
+  border-radius: 8px; border: 2px solid #e8e8e8; background: var(--bg-white);
+  cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.82rem;
+  transition: all 0.2s;
+}
+.country-btn:hover { border-color: var(--sky-blue); background: rgba(78,205,196,0.04); }
+.country-btn img { width: 26px; height: 17px; border-radius: 2px; border: 1px solid #ddd; object-fit: cover; }
+
 /* Country Detail Page */
 .country-detail-page { max-width: 700px; margin: 0 auto; animation: slideUp 0.3s ease; }
 .back-btn {

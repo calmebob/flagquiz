@@ -139,25 +139,47 @@ function CountryDetail({ country, onBack }) {
   );
 }
 
-// ── Main World Map ──
-function WorldMap() {
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, name: '' });
+// ── Continent list view (simplified) ──
+const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+const CONTINENT_EMOJI = { Africa: '🌍', Asia: '🌏', Europe: '🏰', 'North America': '🌎', 'South America': '🌎', Oceania: '🏝️' };
 
-  const countryMap = useMemo(() => {
+function CountryList({ onSelect }) {
+  const grouped = useMemo(() => {
     const map = {};
-    countries.forEach(c => { map[c.code] = c; });
+    CONTINENTS.forEach(c => { map[c] = []; });
+    countries.forEach(c => { if (map[c.continent]) map[c.continent].push(c); });
     return map;
   }, []);
 
-  if (selectedCountry) {
-    return <CountryDetail country={selectedCountry} onBack={() => setSelectedCountry(null)} />;
-  }
+  return (
+    <>
+      {CONTINENTS.map(cont => {
+        const list = grouped[cont];
+        if (!list.length) return null;
+        return (
+          <div className="continent-section" key={cont}>
+            <h3>{CONTINENT_EMOJI[cont]} {cont} <span className="continent-count">({list.length})</span></h3>
+            <div className="country-btn-grid">
+              {list.map(c => (
+                <button key={c.code} className="country-btn" onClick={() => onSelect(c)}>
+                  <img src={getFlagUrl(c.code)} alt="" />
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── Interactive map view ──
+function InteractiveMap({ countryMap, onSelect }) {
+  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, name: '' });
 
   return (
-    <div className="world-map-page">
-      <h2>🗺️ World Map</h2>
-      <p>Click on any country to learn about it!</p>
+    <>
       <div className="map-container" onMouseMove={e => tooltip.show && setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }))}>
         <ComposableMap projection="geoMercator" projectionConfig={{ scale: 130, center: [0, 30] }} style={{ width: '100%', height: 'auto' }}>
           <ZoomableGroup zoom={1} minZoom={1} maxZoom={8}>
@@ -168,7 +190,7 @@ function WorldMap() {
                   geography={geo}
                   onClick={() => {
                     const a2 = geoToAlpha2(geo);
-                    if (a2 && countryMap[a2]) setSelectedCountry(countryMap[a2]);
+                    if (a2 && countryMap[a2]) onSelect(countryMap[a2]);
                   }}
                   onMouseEnter={(evt) => {
                     const a2 = geoToAlpha2(geo);
@@ -187,6 +209,41 @@ function WorldMap() {
         </ComposableMap>
       </div>
       {tooltip.show && <div className="map-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>{tooltip.name}</div>}
+    </>
+  );
+}
+
+// ── Main World Map ──
+function WorldMap() {
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [view, setView] = useState('list');
+
+  const countryMap = useMemo(() => {
+    const map = {};
+    countries.forEach(c => { map[c.code] = c; });
+    return map;
+  }, []);
+
+  if (selectedCountry) {
+    return <CountryDetail country={selectedCountry} onBack={() => setSelectedCountry(null)} />;
+  }
+
+  return (
+    <div className="world-map-page">
+      <h2>🗺️ World Map</h2>
+      <p>Click any country to see its flag and fun facts!</p>
+      <div className="map-view-toggle">
+        <button className={`view-toggle-btn${view === 'list' ? ' active' : ''}`} onClick={() => setView('list')}>
+          <span className="view-toggle-ico">📋</span> Browse by Continent
+        </button>
+        <button className={`view-toggle-btn${view === 'interactive' ? ' active' : ''}`} onClick={() => setView('interactive')}>
+          <span className="view-toggle-ico">🗺️</span> Interactive Map
+        </button>
+      </div>
+      {view === 'list'
+        ? <CountryList onSelect={setSelectedCountry} />
+        : <InteractiveMap countryMap={countryMap} onSelect={setSelectedCountry} />
+      }
     </div>
   );
 }
