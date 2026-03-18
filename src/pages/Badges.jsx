@@ -1,5 +1,6 @@
 import React from 'react';
 import { useProgress } from '../App';
+import { getContinents, CONTINENT_EMOJIS } from '../data/countries';
 
 const COUNTRY_BADGES = [
   { threshold: 1, icon: '🌱', title: 'First Steps', desc: 'Correctly identified 1 country' },
@@ -18,8 +19,7 @@ const PERFECT_BADGES = [
   { threshold: 10, icon: '🏆', title: 'Quiz Legend', desc: '10 perfect quizzes' },
 ];
 
-const CONTINENTS = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
-const CONTINENT_EMOJI = { Africa: '🌍', Asia: '🌏', Europe: '🏰', 'North America': '🌎', 'South America': '🌎', Oceania: '🏝️' };
+const CONTINENTS = getContinents();
 
 function Badges() {
   const { progress, resetProgress } = useProgress();
@@ -49,7 +49,7 @@ function Badges() {
           <span className="badge-stat-label">Perfect Quizzes</span>
         </div>
         <div className="badge-stat">
-          <span className="badge-stat-num">{topContinent ? `${CONTINENT_EMOJI[topContinent]}` : '—'}</span>
+          <span className="badge-stat-num">{topContinent ? `${CONTINENT_EMOJIS[topContinent]}` : '—'}</span>
           <span className="badge-stat-label">{topContinent ? `${topContinent} Expert` : 'No top continent yet'}</span>
         </div>
       </div>
@@ -103,7 +103,7 @@ function Badges() {
             const isTop = cont === topContinent && topCount > 0;
             return (
               <div key={cont} className={`badge-card ${isTop ? 'earned' : count > 0 ? 'partial' : 'locked'}`}>
-                <div className="badge-icon">{CONTINENT_EMOJI[cont]}</div>
+                <div className="badge-icon">{CONTINENT_EMOJIS[cont]}</div>
                 <div className="badge-info">
                   <strong>{cont}</strong>
                   <span>{count} correct answer{count !== 1 ? 's' : ''}</span>

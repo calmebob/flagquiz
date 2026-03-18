@@ -3298,4 +3298,9 @@ export const getContinents = () => {
   return [...new Set(countries.map(c => c.continent))].sort();
 };
 
+export const CONTINENT_EMOJIS = {
+  'Africa': '🌍', 'Asia': '🌏', 'Europe': '🏰',
+  'North America': '🌎', 'South America': '🌎', 'Oceania': '🏝️',
+};
+
 export default countries;

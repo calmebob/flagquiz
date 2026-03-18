@@ -122,11 +122,13 @@ function QuizMultipleChoice({ questions, onFinish }) {
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [selected, setSelected] = useState(null);
-  const [showNext, setShowNext] = useState(false);
   const [results, setResults] = useState([]);
 
   const q = questions[current];
   if (!q) return null;
+
+  const showNext = selected !== null;
+  const selectedCorrect = selected !== null ? q.options.find(o => o.name === selected)?.correct : null;
 
   const handleSelect = (option) => {
     if (selected !== null) return;
@@ -134,14 +136,12 @@ function QuizMultipleChoice({ questions, onFinish }) {
     const correct = option.correct;
     if (correct) setScore(s => s + 1);
     setResults(prev => [...prev, { code: q.country.code, continent: q.country.continent, correct }]);
-    setShowNext(true);
   };
 
   const handleNext = () => {
     if (current + 1 >= questions.length) { onFinish(score, results); return; }
     setCurrent(c => c + 1);
     setSelected(null);
-    setShowNext(false);
   };
 
   const isLast = current + 1 >= questions.length;
@@ -170,8 +170,8 @@ function QuizMultipleChoice({ questions, onFinish }) {
           })}
         </div>
         {selected !== null && (
-          <div className={`quiz-feedback ${q.options.find(o => o.name === selected)?.correct ? 'correct' : 'incorrect'}`}>
-            {q.options.find(o => o.name === selected)?.correct ? '✅ Correct! Great job!' : `❌ Not quite! It's ${q.country.name}`}
+          <div className={`quiz-feedback ${selectedCorrect ? 'correct' : 'incorrect'}`}>
+            {selectedCorrect ? '✅ Correct! Great job!' : `❌ Not quite! It's ${q.country.name}`}
           </div>
         )}
         {showNext && (
@@ -259,12 +259,14 @@ function Results({ score, total, onPlayAgain }) {
   useEffect(() => {
     if (isPerfect) {
       const end = Date.now() + 3000;
+      let handle;
       const frame = () => {
         confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF6B6B','#4ECDC4','#FFE66D','#9B59B6'] });
         confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF6B6B','#4ECDC4','#FFE66D','#9B59B6'] });
-        if (Date.now() < end) requestAnimationFrame(frame);
+        if (Date.now() < end) handle = requestAnimationFrame(frame);
       };
-      frame();
+      handle = requestAnimationFrame(frame);
+      return () => cancelAnimationFrame(handle);
     }
   }, [isPerfect]);
 

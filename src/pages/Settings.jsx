@@ -1,11 +1,6 @@
 import React from 'react';
 import { useSettings, useProgress } from '../App';
-import { getContinents } from '../data/countries';
-
-const CONTINENT_EMOJIS = {
-  'Africa': '🌍', 'Asia': '🌏', 'Europe': '🏰',
-  'North America': '🌎', 'South America': '🌎', 'Oceania': '🏝️',
-};
+import { getContinents, CONTINENT_EMOJIS } from '../data/countries';
 
 function Settings() {
   const { settings, setSettings } = useSettings();

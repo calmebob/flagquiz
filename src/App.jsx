@@ -28,12 +28,13 @@ function loadSettings() {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return DEFAULT_SETTINGS;
     const p = JSON.parse(raw);
+    const filtered = Array.isArray(p.continents)
+      ? p.continents.filter(c => ALL_CONTINENTS.includes(c))
+      : [...ALL_CONTINENTS];
     return {
       numFlags: (Number(p.numFlags) >= 10 && Number(p.numFlags) <= 25) ? Number(p.numFlags) : 25,
       quizMode: p.quizMode === 'typing' ? 'typing' : 'multiple',
-      continents: (Array.isArray(p.continents) ? p.continents.filter(c => ALL_CONTINENTS.includes(c)) : [...ALL_CONTINENTS]).length > 0
-        ? (Array.isArray(p.continents) ? p.continents.filter(c => ALL_CONTINENTS.includes(c)) : [...ALL_CONTINENTS])
-        : [...ALL_CONTINENTS],
+      continents: filtered.length > 0 ? filtered : [...ALL_CONTINENTS],
       smartRepetition: !!p.smartRepetition,
     };
   } catch { return DEFAULT_SETTINGS; }
