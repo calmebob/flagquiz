@@ -240,7 +240,6 @@ function WorldMap() {
           <span className="view-toggle-ico">🗺️</span> Interactive Map
         </button>
       </div>
-      <p className="map-mobile-note">Browse by continent is the easiest option on smaller screens.</p>
       {view === 'list'
         ? <CountryList onSelect={setSelectedCountry} />
         : <InteractiveMap countryMap={countryMap} onSelect={setSelectedCountry} />
