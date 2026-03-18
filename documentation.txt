@@ -1,0 +1,401 @@
+================================================================================
+FLAG EXPLORER - Technology & Design Documentation
+================================================================================
+
+This document explains every technology and design choice made in building
+Flag Explorer, a kid-friendly web app for learning the flags of the world.
+
+
+1. FRAMEWORK: REACT (via Vite)
+================================================================================
+
+Choice: React 19 with Vite as the build tool
+
+Why React:
+  - React is the most widely-used frontend JavaScript framework with the
+    largest ecosystem and community support. This means abundant documentation,
+    tutorials, and community answers when issues arise.
+  - Component-based architecture makes the app easy to understand and modify.
+    Each page (Home, Quiz, Map, Settings) is its own component.
+  - React's state management (useState, useContext) handles quiz state, settings,
+    and user interactions cleanly without needing external state libraries.
+  - React skills are the most transferable for web development learning.
+
+Why NOT other frameworks:
+  - Vue.js: Excellent framework but smaller ecosystem. Fewer learning resources
+    available compared to React, especially for beginners.
+  - Angular: More opinionated and heavier. Requires TypeScript knowledge and has
+    a steeper learning curve. Overkill for a single-page quiz app.
+  - Svelte: Great performance but smaller community. Harder to find help and
+    hosting documentation.
+  - Vanilla JS: Would work but would require manually managing DOM updates,
+    routing, and state. React handles these concerns elegantly.
+
+Why Vite (not Create React App):
+  - Create React App (CRA) is deprecated and no longer maintained.
+  - Vite is the modern standard: faster development server (uses native ES modules),
+    faster builds (uses Rollup), and smaller bundle sizes.
+  - Vite has excellent plugin ecosystem and is framework-agnostic.
+  - Hot Module Replacement (HMR) in Vite is nearly instant, making development
+    faster and more pleasant.
+
+
+2. ROUTING: REACT ROUTER (HashRouter)
+================================================================================
+
+Choice: react-router-dom v6 with HashRouter
+
+Why React Router:
+  - The standard routing library for React with massive adoption.
+  - Declarative routing matches React's component model.
+  - Supports nested routes, route parameters, and navigation guards.
+
+Why HashRouter (not BrowserRouter):
+  - HashRouter uses URL hashes (e.g., /#/quiz) instead of clean URLs (/quiz).
+  - This is critical for static hosting: HashRouter works on ANY static file
+    server (S3, GitHub Pages, Netlify, etc.) without server-side configuration.
+  - BrowserRouter requires server-side URL rewriting to handle direct navigation
+    to routes like /quiz, which means configuring nginx, Apache, or cloud-specific
+    settings. HashRouter avoids this entirely.
+  - Since this app will be deployed as static files, HashRouter ensures the app
+    works everywhere without hosting-provider-specific configuration.
+  - Trade-off: URLs are slightly less clean, but for a kids' quiz app this
+    doesn't matter.
+
+
+3. FLAG IMAGES: FLAGCDN.COM
+================================================================================
+
+Choice: flagcdn.com for flag images loaded via URL
+
+Why flagcdn.com:
+  - Free, open-source CDN for flag images in multiple sizes.
+  - No API key required - just construct a URL with the country code.
+  - Images are served from a global CDN, so they load fast worldwide.
+  - Public domain flag images with no licensing concerns.
+  - Supports multiple resolutions (w320, w640, etc.)
+
+Why NOT other approaches:
+  - Bundled images: Would increase the app bundle size dramatically (200+ flags).
+    CDN-loaded images are cached by the browser and loaded on demand.
+  - Flag emoji: Not consistent across operating systems and devices. Some platforms
+    render them differently or not at all.
+  - Country Flags API: Requires an API key and has rate limits.
+  - SVG flags (flagicons): Good option but adds complexity. CDN images are simpler.
+
+
+4. WORLD MAP: REACT-SIMPLE-MAPS
+================================================================================
+
+Choice: react-simple-maps with TopoJSON world atlas data
+
+Why react-simple-maps:
+  - Purpose-built React component for interactive world maps.
+  - Uses D3's geographic projections under the hood but with a React-friendly API.
+  - Supports zoom, pan, tooltips, and click interactions out of the box.
+  - Uses TopoJSON format which is very compact (the entire world map is ~110KB).
+  - MIT licensed, no usage restrictions.
+
+Why NOT other map libraries:
+  - Leaflet/React-Leaflet: Tile-based maps (like Google Maps). Requires an
+    internet connection to load tiles, and the tile-based approach is overkill
+    for a simple interactive reference map. Also requires a tile provider account.
+  - Google Maps API: Requires an API key, billing account, and has usage costs.
+    Not appropriate for a free educational app.
+  - Mapbox: Requires an API key and has usage-based pricing.
+  - D3 directly: Powerful but requires much more code to achieve the same result.
+    react-simple-maps wraps D3 in convenient React components.
+  - SVG static map: No interactivity without significant custom code.
+
+Map data source:
+  - world-atlas npm package provides TopoJSON data from Natural Earth.
+  - 110m resolution is perfect for our use case - country-level detail without
+    excessive file size.
+  - Countries are identified by ISO 3166-1 numeric codes, which we map to our
+    2-letter codes for flag lookups.
+
+
+5. CONFETTI: CANVAS-CONFETTI
+================================================================================
+
+Choice: canvas-confetti for the perfect score celebration
+
+Why canvas-confetti:
+  - Lightweight (< 5KB gzipped), no dependencies.
+  - Uses HTML5 Canvas for performant particle animations.
+  - Simple API: one function call creates a celebration effect.
+  - MIT licensed.
+
+Why NOT other options:
+  - CSS animations: Limited particle count and browser performance varies.
+  - react-confetti: Heavier, React-specific wrapper. canvas-confetti works
+    in any environment and is lighter.
+  - Lottie animations: Requires creating/finding animation files. More complex
+    setup for a simple effect.
+
+
+6. STYLING: PLAIN CSS WITH CSS VARIABLES
+================================================================================
+
+Choice: Single CSS file with CSS custom properties (variables)
+
+Why plain CSS:
+  - Zero dependencies - no build step for styles, no library to learn.
+  - CSS variables provide a theming system without any framework.
+  - The app is simple enough that CSS Modules or CSS-in-JS add complexity
+    without meaningful benefit.
+  - Any web developer can read and modify the styles.
+
+Why NOT other styling approaches:
+  - Tailwind CSS: Excellent utility-first framework but adds a build dependency
+    and the class-heavy HTML can be harder to read for beginners learning to code.
+  - Styled-components/Emotion: CSS-in-JS adds runtime overhead and a learning
+    curve. The styles are coupled to React, making them less portable.
+  - Sass/SCSS: Adds a preprocessor dependency. Modern CSS now supports nesting
+    and variables natively, reducing the need for Sass.
+  - CSS Modules: Good for larger apps with naming collision concerns. Overkill
+    for a single-developer educational app.
+
+Design philosophy (kid-friendly):
+  - Rounded corners throughout (12-32px border radius) for a soft, friendly feel.
+  - Warm cream background instead of harsh white.
+  - Large, colorful emoji used as icons - universally understood by children.
+  - Large click targets (minimum 44px) for developing motor skills.
+  - Playful animations (float, pop-in, shake) for engagement.
+  - High contrast text for readability.
+  - Fredoka font for headings (rounded, playful) paired with Nunito (clean, readable).
+
+
+7. TYPOGRAPHY: GOOGLE FONTS (Fredoka + Nunito)
+================================================================================
+
+Choice: Fredoka for headings, Nunito for body text
+
+Why these fonts:
+  - Fredoka: A rounded, friendly display font perfect for children's content.
+    Its softness makes it feel approachable and fun.
+  - Nunito: A well-balanced sans-serif that's highly readable at all sizes.
+    Its rounded terminals complement Fredoka while being easier to read in
+    longer text.
+  - Both are served from Google Fonts - free, fast, and reliable CDN delivery.
+
+Why NOT other fonts:
+  - System fonts: Not distinctive enough for a children's app. Arial and
+    Helvetica feel corporate and cold.
+  - Comic Sans: Often mocked, though actually designed for children. Fredoka
+    achieves the same friendly feel with more design credibility.
+  - Custom/premium fonts: Would require licensing and self-hosting. Google Fonts
+    are free and fast.
+
+
+8. DATA ARCHITECTURE: EMBEDDED JSON
+================================================================================
+
+Choice: Country data hardcoded in a JavaScript module
+
+Why embedded data:
+  - Zero API calls needed - the app works completely offline after first load.
+  - No backend server required - the app is purely static files.
+  - No API rate limits, no authentication, no API keys to manage.
+  - Data changes infrequently (country information is relatively stable).
+  - Total data size is small (~30KB for 120+ countries with fun facts).
+
+Why NOT a database or API:
+  - REST API/Backend: Requires a server, database, hosting, and maintenance.
+    Massive overkill for static reference data. Also adds latency to every quiz
+    question.
+  - CIA World Factbook API: No official API exists. Third-party APIs are
+    unreliable and may go offline.
+  - Wikipedia API: Rate-limited, requires parsing complex responses, and the
+    data format changes. Not reliable for a simple quiz app.
+  - Firebase/Supabase: Cloud databases add cost, complexity, and vendor lock-in.
+    Not needed when data fits in a single file.
+
+Data sources used to compile the embedded data:
+  - CIA World Factbook (public domain) for population, capital, and country facts.
+  - Wikipedia for fun facts and similar flag relationships.
+  - Manual curation of common misspellings for the typing quiz mode.
+
+
+9. QUIZ LOGIC: SIMILAR FLAG MATCHING
+================================================================================
+
+The quiz uses a "similar flag" system where each country has a designated
+similar-looking flag. When generating multiple choice options:
+
+  1. The correct answer
+  2. A country with a visually similar flag (e.g., Monaco/Poland, Chad/Romania)
+  3. Two random countries from the active continent pool
+
+This makes the quiz genuinely challenging and educational - children learn to
+distinguish between flags that actually look alike, not just random options
+where the correct answer is obvious.
+
+The typing mode additionally accepts common misspellings (e.g., "Phillipines"
+for Philippines) to avoid frustrating children with spelling, while still
+showing the correct spelling for learning purposes.
+
+
+10. BUILD & DEPLOYMENT: STATIC FILES
+================================================================================
+
+Choice: Vite builds to a static `dist/` folder
+
+Deployment options (all work without modification):
+  - AWS S3 + CloudFront: Upload dist/ to S3, serve via CloudFront CDN.
+  - Google Cloud Storage: Upload dist/ to a GCS bucket with public access.
+  - Netlify: Connect git repo, Netlify auto-builds and deploys.
+  - Vercel: Same as Netlify - git-connected auto-deploy.
+  - GitHub Pages: Push dist/ contents to gh-pages branch.
+  - Azure Static Web Apps: Similar to AWS/GCP approach.
+  - Any nginx/Apache server: Copy dist/ to the web root.
+
+Why this approach:
+  - Maximum portability - no vendor lock-in whatsoever.
+  - No server-side code means no Node.js, Python, or other runtime needed.
+  - Static files are the cheapest hosting option (often free tier eligible).
+  - CDN-friendly: entire app can be cached at the edge.
+  - HashRouter ensures routing works without server configuration.
+
+Deployment steps:
+  1. Run `npm run build` to create the dist/ folder
+  2. Upload the contents of dist/ to any static file hosting
+  3. Done! No environment variables, no database setup, no server configuration.
+
+
+11. PROJECT STRUCTURE
+================================================================================
+
+flag-quiz/
+├── index.html              # Entry point
+├── package.json            # Dependencies and scripts
+├── vite.config.js          # Vite configuration
+├── documentation.txt       # This file
+├── src/
+│   ├── main.jsx           # React entry point, router setup
+│   ├── App.jsx            # App shell, navigation, settings context
+│   ├── index.css          # All styles (single file)
+│   ├── data/
+│   │   └── countries.js   # Country data, flag URL helpers
+│   └── pages/
+│       ├── Home.jsx       # Landing page with 3 main actions
+│       ├── QuizPage.jsx   # Quiz with mode select, MC, typing, results
+│       ├── Settings.jsx   # Quiz configuration
+│       └── WorldMap.jsx   # Interactive world map with country info
+
+
+12. SECURITY
+================================================================================
+
+Even though this is a client-side-only app with no backend or user accounts,
+security is taken seriously because:
+  - The app accepts text input (typing quiz mode)
+  - It's designed for children, who may be targeted by bad actors
+  - Good security practices are important to learn
+
+Measures implemented:
+
+A) HTML Escaping (XSS Prevention):
+  - Every dynamic value rendered into HTML goes through an esc() function that
+    escapes &, <, >, ", and ' to their HTML entity equivalents.
+  - This prevents Cross-Site Scripting (XSS) attacks where malicious HTML or
+    JavaScript could be injected through user input or manipulated data.
+  - In the React app, JSX automatically escapes content, but we add explicit
+    sanitization as a defense-in-depth measure.
+
+B) Input Sanitization:
+  - All text input in the typing quiz is processed through sanitizeInput()
+    which uses a Unicode-aware regex to allow only letters (including accented
+    characters like ñ, é, ü), digits, spaces, hyphens, apostrophes, and periods.
+  - Characters like <, >, =, (, ), {, }, [, ] are stripped on every keystroke.
+  - Input is truncated to 100 characters maximum via both JavaScript and the
+    HTML maxlength attribute.
+
+C) Input Validation (Whitelist Approach):
+  - Navigation targets, quiz modes, and continent selections are validated
+    against explicit whitelists before being processed.
+  - Multiple choice answers use numeric indices rather than injecting data
+    objects into HTML onclick attributes.
+
+D) Data Integrity:
+  - Country data is frozen with Object.freeze() to prevent runtime tampering
+    via the browser console.
+  - All data is hardcoded — no external API calls that could be intercepted.
+
+E) Flag Image Safety:
+  - Flag image URLs are constructed from validated 2-letter country codes
+    using encodeURIComponent() to prevent URL injection.
+  - Images have onerror handlers that gracefully degrade to emoji display.
+
+F) No Sensitive Data:
+  - No authentication, no cookies, no localStorage, no personal data collected.
+  - The app is entirely stateless between page loads.
+
+What we explicitly chose NOT to worry about:
+  - CSRF: No forms submit to a server, so CSRF is not applicable.
+  - SQL injection: No database, so SQL injection is not applicable.
+  - Authentication bypass: No authentication exists.
+  - Session hijacking: No sessions exist.
+
+The security measures are tested by an automated test suite (tests.cjs) that
+includes 10 XSS attack payload simulations, input sanitization verification,
+validation checks, and escaping verification.
+
+
+13. ACCESSIBILITY CONSIDERATIONS
+================================================================================
+
+  - Semantic HTML: buttons for actions, links for navigation.
+  - Large touch targets: all interactive elements are at least 44px.
+  - Color is never the only indicator: correct/incorrect answers use both
+    color AND text/emoji feedback.
+  - Focus management: text input auto-focuses in typing mode.
+  - Keyboard support: Enter key submits answers and advances in typing mode.
+  - Alt text: flag images have alt attributes for screen readers.
+  - Responsive design: works on tablets and phones, important for kids who
+    often use mobile devices.
+
+
+14. LICENSING
+================================================================================
+
+All dependencies use permissive open-source licenses:
+  - React: MIT License
+  - React Router: MIT License
+  - Vite: MIT License
+  - react-simple-maps: MIT License
+  - canvas-confetti: ISC License
+  - d3-geo: ISC License
+  - Google Fonts (Fredoka, Nunito): Open Font License (OFL)
+  - Flag images (flagcdn.com): Public domain
+  - World atlas data: Public domain (Natural Earth)
+
+No proprietary licenses, no usage fees, no API keys required.
+
+
+15. PERFORMANCE
+================================================================================
+
+  - Initial load: ~135KB gzipped (JS + CSS). Very fast on any connection.
+  - Flag images: Loaded on demand from CDN, browser-cached.
+  - Map data: ~110KB TopoJSON, loaded once and cached.
+  - No backend requests: Everything runs client-side after initial load.
+  - React's virtual DOM ensures efficient UI updates during quiz gameplay.
+  - CSS transitions/animations use GPU-accelerated properties (transform, opacity).
+
+
+16. FUTURE ENHANCEMENTS
+================================================================================
+
+If you want to extend this app, here are suggested improvements:
+
+  - High score persistence: Use localStorage to save best scores.
+  - More quiz modes: "Which flag belongs to X country?" (reverse quiz).
+  - Difficulty levels: Easy (4 choices), Medium (6 choices), Hard (typing only).
+  - Flag learning mode: Flashcards showing flag + country name.
+  - Sound effects: Use the Web Audio API for correct/incorrect sounds.
+  - Progress tracking: Track which flags the child gets wrong most often.
+  - Multiplayer: Two players take turns answering on the same device.
+  - PWA support: Add a service worker for full offline capability.
+  - More countries: Add territories, dependencies, and historical flags.
+  - Animations: Add flag waving animations using CSS or Lottie.
