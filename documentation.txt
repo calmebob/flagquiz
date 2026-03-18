@@ -82,25 +82,24 @@ Why HashRouter (not BrowserRouter):
     doesn't matter.
 
 
-3. FLAG IMAGES: FLAGCDN.COM
+3. FLAG IMAGES: FLAG-ICONS (LOCAL SVG)
 ================================================================================
 
-Choice: flagcdn.com for flag images loaded via URL
+Choice: flag-icons npm package, SVG files served locally from /public/flags/
 
-Why flagcdn.com:
-  - Free, open-source CDN for flag images in multiple sizes.
-  - No API key required - just construct a URL with the country code.
-  - Images are served from a global CDN, so they load fast worldwide.
-  - Public domain flag images with no licensing concerns.
-  - Supports multiple resolutions (w320, w640, etc.)
+Why local SVGs:
+  - No CDN dependency - flags load instantly from the same server as the app.
+  - No API key required, no rate limits, no external service to go down.
+  - SVG format scales perfectly at any size with no quality loss.
+  - MIT licensed flag-icons package with comprehensive coverage of all 193 countries.
+  - Works fully offline after initial page load.
 
 Why NOT other approaches:
-  - Bundled images: Would increase the app bundle size dramatically (200+ flags).
-    CDN-loaded images are cached by the browser and loaded on demand.
+  - flagcdn.com: External CDN dependency - if the service goes down, all flags break.
+    Also adds latency and requires an internet connection for every flag load.
   - Flag emoji: Not consistent across operating systems and devices. Some platforms
     render them differently or not at all.
   - Country Flags API: Requires an API key and has rate limits.
-  - SVG flags (flagicons): Good option but adds complexity. CDN images are simpler.
 
 
 4. WORLD MAP: REACT-SIMPLE-MAPS
@@ -285,22 +284,28 @@ Deployment steps:
 11. PROJECT STRUCTURE
 ================================================================================
 
-flag-quiz/
+flag-quiz-2/
 ├── index.html              # Entry point
 ├── package.json            # Dependencies and scripts
 ├── vite.config.js          # Vite configuration
 ├── documentation.txt       # This file
+├── public/
+│   ├── flags/             # 193 SVG flag files (from flag-icons package)
+│   └── maps/              # 193 country-specific TopoJSON map files
 ├── src/
 │   ├── main.jsx           # React entry point, router setup
-│   ├── App.jsx            # App shell, navigation, settings context
+│   ├── App.jsx            # App shell, navigation, settings/progress context
 │   ├── index.css          # All styles (single file)
 │   ├── data/
-│   │   └── countries.js   # Country data, flag URL helpers
+│   │   ├── countries.js       # Country data, flag URL helpers
+│   │   ├── capitalCoords.js   # GPS coordinates for capital cities
+│   │   └── countryScales.js   # Zoom scales for individual country maps
 │   └── pages/
-│       ├── Home.jsx       # Landing page with 3 main actions
+│       ├── Home.jsx       # Landing page with navigation cards
 │       ├── QuizPage.jsx   # Quiz with mode select, MC, typing, results
-│       ├── Settings.jsx   # Quiz configuration
-│       └── WorldMap.jsx   # Interactive world map with country info
+│       ├── Settings.jsx   # Quiz configuration and continent filters
+│       ├── WorldMap.jsx   # Interactive world map with country info
+│       └── Badges.jsx     # Achievement badges and progress display
 
 
 12. SECURITY
@@ -314,51 +319,26 @@ security is taken seriously because:
 
 Measures implemented:
 
-A) HTML Escaping (XSS Prevention):
-  - Every dynamic value rendered into HTML goes through an esc() function that
-    escapes &, <, >, ", and ' to their HTML entity equivalents.
-  - This prevents Cross-Site Scripting (XSS) attacks where malicious HTML or
-    JavaScript could be injected through user input or manipulated data.
-  - In the React app, JSX automatically escapes content, but we add explicit
-    sanitization as a defense-in-depth measure.
+A) XSS Prevention:
+  - React's JSX automatically escapes all dynamic content rendered into the DOM,
+    preventing Cross-Site Scripting (XSS) attacks by default.
 
 B) Input Sanitization:
   - All text input in the typing quiz is processed through sanitizeInput()
     which uses a Unicode-aware regex to allow only letters (including accented
     characters like ñ, é, ü), digits, spaces, hyphens, apostrophes, and periods.
   - Characters like <, >, =, (, ), {, }, [, ] are stripped on every keystroke.
-  - Input is truncated to 100 characters maximum via both JavaScript and the
-    HTML maxlength attribute.
+  - Input is truncated to 100 characters maximum.
 
-C) Input Validation (Whitelist Approach):
-  - Navigation targets, quiz modes, and continent selections are validated
-    against explicit whitelists before being processed.
-  - Multiple choice answers use numeric indices rather than injecting data
-    objects into HTML onclick attributes.
-
-D) Data Integrity:
-  - Country data is frozen with Object.freeze() to prevent runtime tampering
-    via the browser console.
-  - All data is hardcoded — no external API calls that could be intercepted.
-
-E) Flag Image Safety:
-  - Flag image URLs are constructed from validated 2-letter country codes
-    using encodeURIComponent() to prevent URL injection.
-  - Images have onerror handlers that gracefully degrade to emoji display.
-
-F) No Sensitive Data:
-  - No authentication, no cookies, no localStorage, no personal data collected.
-  - The app is entirely stateless between page loads.
+C) No Sensitive Data:
+  - No authentication, no cookies, no personal data collected.
+  - localStorage is used only for quiz settings and progress (no PII).
 
 What we explicitly chose NOT to worry about:
   - CSRF: No forms submit to a server, so CSRF is not applicable.
   - SQL injection: No database, so SQL injection is not applicable.
   - Authentication bypass: No authentication exists.
   - Session hijacking: No sessions exist.
-
-The security measures are tested by an automated test suite (tests.cjs) that
-includes 10 XSS attack payload simulations, input sanitization verification,
-validation checks, and escaping verification.
 
 
 13. ACCESSIBILITY CONSIDERATIONS
