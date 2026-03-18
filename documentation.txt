@@ -403,10 +403,8 @@ No proprietary licenses, no usage fees, no API keys required.
   - CSS transitions/animations use GPU-accelerated properties (transform, opacity).
 
 
-16. FUTURE ENHANCEMENTS
+16. IDEAS FOR FUTURE ENHANCEMENTS
 ================================================================================
-
-If you want to extend this app, here are suggested improvements:
 
   - High score persistence: Use localStorage to save best scores.
   - More quiz modes: "Which flag belongs to X country?" (reverse quiz).
