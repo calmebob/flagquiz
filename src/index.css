@@ -39,7 +39,7 @@ body {
 
 h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }
 
-.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 .app-bg {
   position: fixed; inset: 0; z-index: -1;
@@ -77,7 +77,7 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }
 .page { flex: 1; padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
 /* Home */
-.home { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 180px); gap: 48px; text-align: center; }
+.home { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 180px); min-height: calc(100dvh - 180px); gap: 48px; text-align: center; }
 .home-hero h2 { font-size: 3rem; margin-bottom: 12px; background: linear-gradient(135deg, var(--sky-blue), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .home-hero p { font-size: 1.2rem; color: var(--text-medium); max-width: 500px; }
 .home-globe { font-size: 6rem; animation: float 3s ease-in-out infinite; margin-bottom: 8px; }
@@ -279,6 +279,7 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }
 .view-toggle-btn:hover { border-color: var(--sky-blue-light); }
 .view-toggle-btn.active { border-color: var(--sky-blue); background: rgba(78,205,196,0.08); color: var(--text-dark); }
 .view-toggle-ico { font-size: 1.1rem; }
+.map-mobile-note { text-align: center; font-size: 0.85rem; color: var(--text-medium); }
 
 /* Country list (continent browse) */
 .continent-section {
@@ -425,19 +426,42 @@ h1, h2, h3, h4 { font-family: 'Fredoka', sans-serif; }
 /* Responsive */
 @media (max-width: 768px) {
   .nav-bar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
-  .nav-links { width: 100%; justify-content: center; }
-  .nav-link { padding: 8px 14px; font-size: 0.85rem; }
+  .nav-logo { width: 100%; justify-content: center; }
+  .nav-links { width: 100%; justify-content: center; flex-wrap: wrap; }
+  .nav-link { padding: 8px 12px; font-size: 0.85rem; }
   .page { padding: 20px 16px; }
+  .home { min-height: auto; gap: 32px; }
   .home-hero h2 { font-size: 2rem; }
+  .home-hero p { font-size: 1.05rem; }
+  .home-card { padding: 28px 22px; }
   .home-cards-main { grid-template-columns: 1fr; max-width: 360px; }
   .mode-toggle { flex-direction: column; }
+  .quiz-progress { gap: 10px; }
+  .quiz-progress-text, .quiz-score { font-size: 0.9rem; }
+  .quiz-flag-container { padding: 24px 20px; gap: 20px; }
   .quiz-options { grid-template-columns: 1fr; }
   .quiz-flag-img { width: 220px; }
+  .quiz-question { font-size: 1.2rem; }
+  .quiz-option, .quiz-text-input, .quiz-submit-btn, .quiz-next-btn { font-size: 1rem; }
+  .results { padding-top: 24px; }
+  .results-card, .perfect-screen { padding: 32px 24px; }
+  .results h2 { font-size: 1.8rem; }
+  .results-score { font-size: 3rem; }
+  .settings { gap: 24px; }
+  .settings-card { padding: 24px 20px; }
   .continent-grid { grid-template-columns: 1fr; }
+  .smart-rep-toggle { align-items: flex-start; }
+  .map-view-toggle { flex-direction: column; }
+  .view-toggle-btn { justify-content: center; }
+  .continent-section { padding: 20px 16px; }
   .country-detail-header { flex-direction: column; align-items: center; text-align: center; }
+  .country-detail-card { padding: 24px 20px; }
   .country-detail-flag { width: 220px; }
   .country-info-meta { justify-content: center; }
+  .country-detail-map { width: calc(100% + 40px); margin-left: -20px; margin-right: -20px; height: 220px; }
+  .map-tooltip { display: none; }
   .badges-stats { flex-direction: column; align-items: center; }
+  .badge-stat { width: 100%; max-width: 280px; }
   .badges-grid { grid-template-columns: 1fr; }
   .home-secondary-links { flex-direction: column; gap: 8px; }
 }
