@@ -11,9 +11,9 @@ import capitalCoords from '../data/capitalCoords';
 import countryScales from '../data/countryScales';
 
 // 110m for the main world map (lightweight)
-const GEO_URL_110 = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+const GEO_URL_110 = `${import.meta.env.BASE_URL}map-data/countries-110m.json`;
 // 50m for the country detail map (higher fidelity borders)
-const GEO_URL_50 = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json';
+const GEO_URL_50 = `${import.meta.env.BASE_URL}map-data/countries-50m.json`;
 
 const NUMERIC_TO_ALPHA2 = {
   "004":"af","008":"al","012":"dz","020":"ad","024":"ao","028":"ag","032":"ar","051":"am","036":"au","040":"at",
